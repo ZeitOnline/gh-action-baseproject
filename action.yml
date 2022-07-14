@@ -125,7 +125,7 @@ runs:
 
     - name: Login to GCR
       if: inputs.gcr_auth == 'true'
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         registry: eu.gcr.io
         username: oauth2accesstoken

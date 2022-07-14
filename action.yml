@@ -107,7 +107,7 @@ runs:
 
     - name: Write GKE Credentials to kubeconfig
       if: inputs.gke_auth == 'true'
-      uses: google-github-actions/get-gke-credentials@v0.6.0
+      uses: google-github-actions/get-gke-credentials@v0.8.0
       with:
         cluster_name: ${{ steps.baseproject-config.outputs.cluster_name }}
         project_id: ${{ steps.baseproject-config.outputs.cluster_project }}

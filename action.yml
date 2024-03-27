@@ -226,7 +226,7 @@ runs:
         echo "setup_buildx=$setup_buildx" >> $GITHUB_ENV
     - name: Setup docker buildx container
       if: env.setup_buildx == 'true'
-      uses: docker/setup-buildx-action@v3.1.0
+      uses: docker/setup-buildx-action@v3.2.0
     # Support `docker buildx build --cache-[from}to] type=gha` directly,
     # and not just via docker/build-push-action.
     - name: Setup docker buildx environment

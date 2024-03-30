@@ -7,7 +7,7 @@ jobs:
     runs-on: zon-ubuntu-general-dind
     steps:
       - uses: actions/checkout@v4
-      - uses: wagoid/commitlint-github-action@v5
+      - uses: wagoid/commitlint-github-action@v6
 
   tests:
     runs-on: zon-ubuntu-general-dind

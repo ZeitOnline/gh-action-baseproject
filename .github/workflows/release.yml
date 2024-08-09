@@ -15,10 +15,10 @@ jobs:
 
     steps:
       - id: release
-        uses: googleapis/release-please-action@v4
+        uses: googleapis/release-please-action@7987652d64b4581673a76e33ad5e98e3dd56832f # v4
         with:
           release-type: simple
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
       - name: tag major and minor versions
         if: ${{ steps.release.outputs.release_created }}
         run: |

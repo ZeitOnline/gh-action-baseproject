@@ -99,7 +99,7 @@ runs:
 
     - name: Retrieve Baseproject Environment Config from Vault
       id: raw-config
-      uses: hashicorp/vault-action@v3.0.0
+      uses: hashicorp/vault-action@d1720f055e0635fd932a1d2a48f87a666a57906c # v3.0.0
       with:
         url: https://vault.ops.zeit.de
         method: jwt
@@ -128,7 +128,7 @@ runs:
 
     - name: Retrieve zon-ops GitHub user GPG key
       id: zon-ops-gpg
-      uses: hashicorp/vault-action@v3.0.0
+      uses: hashicorp/vault-action@d1720f055e0635fd932a1d2a48f87a666a57906c # v3.0.0
       with:
         url: https://vault.ops.zeit.de
         method: jwt
@@ -137,7 +137,7 @@ runs:
         secrets: zon/v1/github/zon-ops gpg_key_private
 
     - name: Import GPG key for zon-ops user
-      uses: crazy-max/ghaction-import-gpg@v6
+      uses: crazy-max/ghaction-import-gpg@01dd5d3ca463c7f10f7f4f7b4f177225ac661ee4 # v6
       continue-on-error: true
       with:
         gpg_private_key: ${{ steps.zon-ops-gpg.outputs.gpg_key_private }}
@@ -149,7 +149,7 @@ runs:
     - name: GCloud OIDC Auth
       id: auth
       if: inputs.google_auth == 'true' || inputs.gke_auth == 'true' || inputs.gcr_auth == 'true' || inputs.gar_docker_auth == 'true'
-      uses: google-github-actions/auth@v2
+      uses: google-github-actions/auth@f112390a2df9932162083945e46d439060d66ec2 # v2
       with:
         token_format: 'access_token'
         workload_identity_provider: projects/161854031382/locations/global/workloadIdentityPools/github-pool/providers/github-actions-provider
@@ -163,7 +163,7 @@ runs:
 
     - name: Write GKE Credentials to kubeconfig
       if: inputs.gke_auth == 'true'
-      uses: google-github-actions/get-gke-credentials@v2.1.0
+      uses: google-github-actions/get-gke-credentials@c02be8662df01db62234e9b9cff0765d1c1827ae # v2.1.0
       with:
         cluster_name: ${{ steps.baseproject-config.outputs.cluster_name }}
         project_id: ${{ steps.baseproject-config.outputs.cluster_project }}
@@ -175,7 +175,7 @@ runs:
 
     - name: Login to GCR
       if: inputs.gcr_auth == 'true'
-      uses: docker/login-action@v3
+      uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
       with:
         registry: eu.gcr.io
         username: oauth2accesstoken
@@ -183,7 +183,7 @@ runs:
 
     - name: Login to Docker GAR
       if: inputs.gar_docker_auth == 'true'
-      uses: docker/login-action@v3
+      uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
       with:
         registry: europe-west3-docker.pkg.dev
         username: oauth2accesstoken
@@ -196,7 +196,7 @@ runs:
     - name: Export a Vault token
       id: vault-export-token
       if: inputs.vault_export_token == 'true'
-      uses: hashicorp/vault-action@v3.0.0
+      uses: hashicorp/vault-action@d1720f055e0635fd932a1d2a48f87a666a57906c # v3.0.0
       with:
         url: https://vault.ops.zeit.de
         method: jwt
@@ -226,7 +226,7 @@ runs:
         echo "setup_buildx=$setup_buildx" >> $GITHUB_ENV
     - name: Setup docker buildx container
       if: env.setup_buildx == 'true'
-      uses: docker/setup-buildx-action@v3.1.0
+      uses: docker/setup-buildx-action@0d103c3126aa41d772a8362f6aa67afac040f80c # v3.1.0
       with:
         buildkitd-flags: --debug
         config-inline: |
@@ -237,4 +237,4 @@ runs:
     # and not just via docker/build-push-action.
     - name: Setup docker buildx environment
       if: env.setup_buildx == 'true'
-      uses: crazy-max/ghaction-github-runtime@v3.0.0
+      uses: crazy-max/ghaction-github-runtime@b3a9207c0e1ef41f4cf215303c976869d0c2c1c4 # v3.0.0

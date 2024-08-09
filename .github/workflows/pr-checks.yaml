@@ -6,8 +6,8 @@ jobs:
   commitlint:
     runs-on: zon-ubuntu-general-dind
     steps:
-      - uses: actions/checkout@v4
-      - uses: wagoid/commitlint-github-action@v5
+      - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
+      - uses: wagoid/commitlint-github-action@9763196e10f27aef304c9b8b660d31d97fce0f99 # v5
 
   tests:
     runs-on: zon-ubuntu-general-dind
@@ -17,7 +17,7 @@ jobs:
 
     steps:
     - name: Check out repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4
 
     - name: Call baseproject GHA
       id: baseproject
@@ -36,7 +36,7 @@ jobs:
       run: kubectl create configmap test-runner-${{ github.run_id }}-${{ github.run_attempt }} --from-literal=foo=bar
 
     - name: '[TEST] Read example value from Vault'
-      uses: hashicorp/vault-action@v3
+      uses: hashicorp/vault-action@d1720f055e0635fd932a1d2a48f87a666a57906c # v3
       with:
         url: ${{ steps.baseproject.outputs.vault_addr }}
         token: ${{ steps.baseproject.outputs.vault_token }}

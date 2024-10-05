@@ -149,7 +149,7 @@ runs:
     - name: GCloud OIDC Auth
       id: auth
       if: inputs.google_auth == 'true' || inputs.gke_auth == 'true' || inputs.gcr_auth == 'true' || inputs.gar_docker_auth == 'true'
-      uses: google-github-actions/auth@62cf5bd3e4211a0a0b51f2c6d6a37129d828611d # v2
+      uses: google-github-actions/auth@8254fb75a33b976a221574d287e93919e6a36f70 # v2
       with:
         token_format: 'access_token'
         workload_identity_provider: projects/161854031382/locations/global/workloadIdentityPools/github-pool/providers/github-actions-provider

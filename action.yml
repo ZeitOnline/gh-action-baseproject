@@ -137,7 +137,7 @@ runs:
         secrets: zon/v1/github/zon-ops gpg_key_private
 
     - name: Import GPG key for zon-ops user
-      uses: crazy-max/ghaction-import-gpg@01dd5d3ca463c7f10f7f4f7b4f177225ac661ee4 # v6
+      uses: crazy-max/ghaction-import-gpg@cb9bde2e2525e640591a934b1fd28eef1dcaf5e5 # v6
       continue-on-error: true
       with:
         gpg_private_key: ${{ steps.zon-ops-gpg.outputs.gpg_key_private }}

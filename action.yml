@@ -167,7 +167,7 @@ runs:
 
     - name: Write GKE Credentials to kubeconfig
       if: inputs.gke_auth == 'true'
-      uses: google-github-actions/get-gke-credentials@6051de21ad50fbb1767bc93c11357a49082ad116 # v2.2.1
+      uses: google-github-actions/get-gke-credentials@9025e8f90f2d8e0c3dafc3128cc705a26d992a6a # v2.3.0
       with:
         cluster_name: ${{ steps.baseproject-config.outputs.cluster_name }}
         project_id: ${{ steps.baseproject-config.outputs.cluster_project }}
@@ -229,7 +229,7 @@ runs:
         echo "setup_buildx=$setup_buildx" >> $GITHUB_ENV
     - name: Setup docker buildx container
       if: env.setup_buildx == 'true'
-      uses: docker/setup-buildx-action@c47758b77c9736f4b2ef4073d4d51994fabfe349 # v3.7.1
+      uses: docker/setup-buildx-action@6524bf65af31da8d45b59e8c27de4bd072b392f5 # v3.8.0
       with:
         buildkitd-config-inline: |
           debug = true

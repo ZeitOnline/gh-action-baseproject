@@ -103,7 +103,7 @@ runs:
 
     - name: Retrieve Baseproject Environment Config from Vault
       id: raw-config
-      uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
+      uses: hashicorp/vault-action@4c06c5ccf5c0761b6029f56cfb1dcf5565918a3b # v3.4.0
       with:
         url: https://vault.ops.zeit.de
         method: jwt
@@ -132,7 +132,7 @@ runs:
 
     - name: Retrieve zon-ops GitHub user GPG key
       id: zon-ops-gpg
-      uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
+      uses: hashicorp/vault-action@4c06c5ccf5c0761b6029f56cfb1dcf5565918a3b # v3.4.0
       with:
         url: https://vault.ops.zeit.de
         method: jwt
@@ -200,7 +200,7 @@ runs:
     - name: Export a Vault token
       id: vault-export-token
       if: inputs.vault_export_token == 'true'
-      uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
+      uses: hashicorp/vault-action@4c06c5ccf5c0761b6029f56cfb1dcf5565918a3b # v3.4.0
       with:
         url: https://vault.ops.zeit.de
         method: jwt

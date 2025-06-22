@@ -179,7 +179,7 @@ runs:
 
     - name: Login to GCR
       if: inputs.gcr_auth == 'true'
-      uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
+      uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
       with:
         registry: eu.gcr.io
         username: oauth2accesstoken
@@ -187,7 +187,7 @@ runs:
 
     - name: Login to Docker GAR
       if: inputs.gar_docker_auth == 'true'
-      uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3
+      uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3
       with:
         registry: europe-west3-docker.pkg.dev
         username: oauth2accesstoken

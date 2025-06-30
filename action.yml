@@ -237,7 +237,7 @@ runs:
           debug = true
           [registry."docker.io"]
             mirrors = ["https://mirror.gcr.io"]
-    # Support `docker buildx build --cache-[from}to] type=gha` directly,
+    # Support `docker buildx build --cache-[from|to] type=gha` directly,
     # and not just via docker/build-push-action.
     - name: Setup docker buildx environment
       if: env.setup_buildx == 'true'

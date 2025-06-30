@@ -163,7 +163,9 @@ runs:
       id: output_gcloud_token
       if: steps.auth.outputs.access_token != ''
       shell: bash
-      run: echo "gcloud_access_token=${{ steps.auth.outputs.access_token }}" >> $GITHUB_OUTPUT
+      run: |
+        echo "gcloud_access_token=${{ steps.auth.outputs.access_token }}" >> $GITHUB_OUTPUT
+        echo "GCLOUD_TOKEN=${{ steps.auth.outputs.access_token }}" >> $GITHUB_ENV
 
     - name: Write GKE Credentials to kubeconfig
       if: inputs.gke_auth == 'true'

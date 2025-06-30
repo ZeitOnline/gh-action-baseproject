@@ -210,7 +210,7 @@ runs:
         secrets: sys/auth "token/" # Because the action needs to read something and Token auth is always there
 
     - id: vault_token
-      run: echo "vault_token=$(echo $VAULT_TOKEN)" >> $GITHUB_OUTPUT
+      run: echo "vault_token=$VAULT_TOKEN" >> $GITHUB_OUTPUT
       shell: bash
 
     - name: Setup Python Artifact Registry

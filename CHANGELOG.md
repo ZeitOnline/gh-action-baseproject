@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.12.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.11.1...v0.12.0) (2025-07-03)
+
+
+### Features
+
+* export gcloud access token as env var ([77ebb4b](https://github.com/ZeitOnline/gh-action-baseproject/commit/77ebb4b4754334b348c2ca02ecca111b59c88621))
+
+
+### Bug Fixes
+
+* **deps:** update github-actions ([16c3ed7](https://github.com/ZeitOnline/gh-action-baseproject/commit/16c3ed77e8e6044a4cf266865965ee32606b2619))
+
 ## [0.11.1](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.11.0...v0.11.1) (2025-01-07)
 
 

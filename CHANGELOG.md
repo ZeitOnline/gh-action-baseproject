@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.13.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.12.0...v0.13.0) (2025-08-27)
+
+
+### Features
+
+* read cluster info from separate secret ([43c5930](https://github.com/ZeitOnline/gh-action-baseproject/commit/43c59303458d1c62c79719ba97b90286dfb414e5))
+
 ## [0.12.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.11.1...v0.12.0) (2025-07-03)
 
 

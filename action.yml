@@ -66,12 +66,6 @@ outputs:
     value: ${{ steps.baseproject-config.outputs.ci_sa_name }}
   wi_sa_name:
     value: ${{ steps.baseproject-config.outputs.wi_sa_name }}
-  cluster_name:
-    value: ${{ steps.baseproject-config.outputs.cluster_name }}
-  cluster_project:
-    value: ${{ steps.baseproject-config.outputs.cluster_project }}
-  cluster_location:
-    value: ${{ steps.baseproject-config.outputs.cluster_location }}
   vault_role:
     value: ${{ steps.baseproject-config.outputs.vault_role }}
   vault_addr:
@@ -84,6 +78,14 @@ outputs:
     value: ${{ steps.baseproject-config.outputs.gha_vault_role }}-${{ steps.repo_without_slash.outputs.result }}
   gcloud_access_token:
     value: ${{ steps.output_gcloud_token.outputs.gcloud_access_token }}
+
+  # Conditional outputs
+  cluster_name:
+    value: ${{ steps.baseproject-config.outputs.cluster_name || '' }}
+  cluster_project:
+    value: ${{ steps.baseproject-config.outputs.cluster_project || '' }}
+  cluster_location:
+    value: ${{ steps.baseproject-config.outputs.cluster_location || '' }}
 
   # Static outputs
   gcr_image_registry:
@@ -99,7 +101,7 @@ runs:
   steps:
     - id: vault_path
       shell: bash
-      run: echo "result=zon-v2/data/baseproject/${{ inputs.project_name }}/${{ inputs.environment }}/${{ inputs.unique_id }}/infos" | tr -s / >> $GITHUB_OUTPUT
+      run: echo "result=zon-v2/data/baseproject/${{ inputs.project_name }}/${{ inputs.environment }}/${{ inputs.unique_id }}" | tr -s / >> $GITHUB_OUTPUT
 
     - name: Retrieve Baseproject Environment Config from Vault
       id: raw-config
@@ -109,8 +111,10 @@ runs:
         method: jwt
         path: github-actions
         role: gha-baseproject
+        ignoreNotFound: true
         secrets: |
-          ${{ steps.vault_path.outputs.result }} raw;
+          ${{ steps.vault_path.outputs.result }}/infos raw | INFOS;
+          ${{ steps.vault_path.outputs.result }}/infos-k8s raw | INFOS_K8S;
 
     - id: baseproject-config
       shell: bash
@@ -121,14 +125,29 @@ runs:
       run: |
         echo "project_name=${{ inputs.project_name }}" >> $GITHUB_OUTPUT
         echo "environment=${{ inputs.environment }}" >> $GITHUB_OUTPUT
-        echo "namespace=${{ fromJSON(steps.raw-config.outputs.raw).namespace }}" >> $GITHUB_OUTPUT
-        echo "ci_sa_name=${{ fromJSON(steps.raw-config.outputs.raw).ci-sa-name }}" >> $GITHUB_OUTPUT
-        echo "wi_sa_name=${{ fromJSON(steps.raw-config.outputs.raw).wi-sa-name }}" >> $GITHUB_OUTPUT
-        echo "cluster_name=${{ fromJSON(steps.raw-config.outputs.raw).cluster-name }}" >> $GITHUB_OUTPUT
-        echo "cluster_project=${{ fromJSON(steps.raw-config.outputs.raw).cluster-project }}" >> $GITHUB_OUTPUT
-        echo "cluster_location=${{ fromJSON(steps.raw-config.outputs.raw).cluster-location }}" >> $GITHUB_OUTPUT
-        echo "vault_role=${{ fromJSON(steps.raw-config.outputs.raw).vault-role }}" >> $GITHUB_OUTPUT
-        echo "gha_vault_role=${{ fromJSON(steps.raw-config.outputs.raw).gha-vault-role }}" >> $GITHUB_OUTPUT
+        echo "ci_sa_name=${{ fromJSON(steps.raw-config.outputs.INFOS).ci-sa-name }}" >> $GITHUB_OUTPUT
+        echo "wi_sa_name=${{ fromJSON(steps.raw-config.outputs.INFOS).wi-sa-name }}" >> $GITHUB_OUTPUT
+        echo "vault_role=${{ fromJSON(steps.raw-config.outputs.INFOS).vault-role }}" >> $GITHUB_OUTPUT
+        echo "gha_vault_role=${{ fromJSON(steps.raw-config.outputs.INFOS).gha-vault-role }}" >> $GITHUB_OUTPUT
+
+        if [[ "${{ inputs.gke_auth }}" == "true" ]]; then
+          # Check if INFOS_K8S exists and is not empty, otherwise fall back to INFOS, can not use fromJSON
+          # directly here because GitHub Actions tries to evaluate the fromJSON() expressions at template expansion time
+          INFOS_K8S='${{ steps.raw-config.outputs.INFOS_K8S }}'
+          INFOS='${{ steps.raw-config.outputs.INFOS }}'
+          
+          if [[ -n "$INFOS_K8S" && "$INFOS_K8S" != "null" && "$INFOS_K8S" != "" ]]; then
+            echo "cluster_name=$(echo "$INFOS_K8S" | jq -r '.["cluster-name"] // empty')" >> $GITHUB_OUTPUT
+            echo "cluster_project=$(echo "$INFOS_K8S" | jq -r '.["cluster-project"] // empty')" >> $GITHUB_OUTPUT
+            echo "cluster_location=$(echo "$INFOS_K8S" | jq -r '.["cluster-location"] // empty')" >> $GITHUB_OUTPUT
+            echo "namespace=$(echo "$INFOS_K8S" | jq -r '.["namespace"] // empty')" >> $GITHUB_OUTPUT
+          else
+            echo "cluster_name=$(echo "$INFOS" | jq -r '.["cluster-name"] // empty')" >> $GITHUB_OUTPUT
+            echo "cluster_project=$(echo "$INFOS" | jq -r '.["cluster-project"] // empty')" >> $GITHUB_OUTPUT
+            echo "cluster_location=$(echo "$INFOS" | jq -r '.["cluster-location"] // empty')" >> $GITHUB_OUTPUT
+            echo "namespace=$(echo "$INFOS" | jq -r '.["namespace"] // empty')" >> $GITHUB_OUTPUT
+          fi
+        fi
 
     - name: Retrieve zon-ops GitHub user GPG key
       id: zon-ops-gpg

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.13.0...v0.14.0) (2025-10-24)
+
+
+### Features
+
+* split baseproject secret retrieval ([5688be2](https://github.com/ZeitOnline/gh-action-baseproject/commit/5688be2be1e120590175062fb3bf61dd342cba9d))
+
 ## [0.13.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.12.0...v0.13.0) (2025-08-27)
 
 

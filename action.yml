@@ -176,7 +176,7 @@ runs:
 
     - name: GCloud OIDC Auth
       id: auth
-      if: inputs.google_auth == 'true' || inputs.gke_auth == 'true' || inputs.gar_docker_auth == 'true'
+      if: inputs.google_auth == 'true' || inputs.gar_docker_auth == 'true'
       uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2
       with:
         token_format: 'access_token'
@@ -190,18 +190,6 @@ runs:
       run: |
         echo "gcloud_access_token=${{ steps.auth.outputs.access_token }}" >> $GITHUB_OUTPUT
         echo "GCLOUD_TOKEN=${{ steps.auth.outputs.access_token }}" >> $GITHUB_ENV
-
-    - name: Write GKE Credentials to kubeconfig
-      if: inputs.gke_auth == 'true'
-      uses: google-github-actions/get-gke-credentials@d0cee45012069b163a631894b98904a9e6723729 # v2.3.3
-      with:
-        cluster_name: ${{ steps.baseproject-config-k8s.outputs.cluster_name }}
-        project_id: ${{ steps.baseproject-config-k8s.outputs.cluster_project }}
-        location: ${{ steps.baseproject-config-k8s.outputs.cluster_location }}
-
-    - if: inputs.gke_auth == 'true'
-      shell: bash
-      run: kubectl config set-context --current --namespace=${{ steps.baseproject-config-k8s.outputs.namespace }}
 
     - name: Login to Docker GAR
       if: inputs.gar_docker_auth == 'true'
@@ -237,6 +225,7 @@ runs:
       shell: bash
       run: |
         ${{ inputs.python_binary }} -m pip install --upgrade --upgrade-strategy eager setuptools twine keyrings.google-artifactregistry-auth
+
     - name: Parse setup docker buildx input
       shell: bash
       run: |
@@ -245,6 +234,7 @@ runs:
             setup_buildx="true"
         fi
         echo "setup_buildx=$setup_buildx" >> $GITHUB_ENV
+
     - name: Setup docker buildx container
       if: env.setup_buildx == 'true'
       uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
@@ -253,9 +243,29 @@ runs:
           debug = true
           [registry."docker.io"]
             mirrors = ["https://mirror.gcr.io"]
+
     # Support `docker buildx build --cache-[from|to] type=gha` directly,
     # and not just via docker/build-push-action.
     - name: Setup docker buildx environment
       if: env.setup_buildx == 'true'
       uses: crazy-max/ghaction-github-runtime@3cb05d89e1f492524af3d41a1c98c83bc3025124 # v3.1.0
 
+    - name: GCloud OIDC Auth for GKE Direct WIF
+      id: auth_gke
+      if: inputs.gke_auth == 'true'
+      uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2
+      with:
+        workload_identity_provider: projects/161854031382/locations/global/workloadIdentityPools/github-pool/providers/github-actions-provider
+    - name: Write GKE Credentials to kubeconfig
+      if: inputs.gke_auth == 'true'
+      id: gke-credentials
+      uses: google-github-actions/get-gke-credentials@d0cee45012069b163a631894b98904a9e6723729 # v2.3.3
+      with:
+        cluster_name: ${{ steps.baseproject-config-k8s.outputs.cluster_name }}
+        project_id: ${{ steps.baseproject-config-k8s.outputs.cluster_project }}
+        location: ${{ steps.baseproject-config-k8s.outputs.cluster_location }}
+
+    - name: Set Kubernetes Namespace
+      if: inputs.gke_auth == 'true'
+      shell: bash
+      run: kubectl config set-context --current --namespace=${{ steps.baseproject-config-k8s.outputs.namespace }}

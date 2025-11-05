@@ -182,7 +182,7 @@ runs:
 
     - name: GCloud OIDC Auth
       id: auth
-      if: inputs.google_auth == 'true' || inputs.gke_auth == 'true' || inputs.gcr_auth == 'true' || inputs.gar_docker_auth == 'true'
+      if: inputs.google_auth == 'true' || inputs.gcr_auth == 'true' || inputs.gar_docker_auth == 'true'
       uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2
       with:
         token_format: 'access_token'
@@ -196,18 +196,6 @@ runs:
       run: |
         echo "gcloud_access_token=${{ steps.auth.outputs.access_token }}" >> $GITHUB_OUTPUT
         echo "GCLOUD_TOKEN=${{ steps.auth.outputs.access_token }}" >> $GITHUB_ENV
-
-    - name: Write GKE Credentials to kubeconfig
-      if: inputs.gke_auth == 'true'
-      uses: google-github-actions/get-gke-credentials@d0cee45012069b163a631894b98904a9e6723729 # v2.3.3
-      with:
-        cluster_name: ${{ steps.baseproject-config-k8s.outputs.cluster_name }}
-        project_id: ${{ steps.baseproject-config-k8s.outputs.cluster_project }}
-        location: ${{ steps.baseproject-config-k8s.outputs.cluster_location }}
-
-    - if: inputs.gke_auth == 'true'
-      shell: bash
-      run: kubectl config set-context --current --namespace=${{ steps.baseproject-config-k8s.outputs.namespace }}
 
     - name: Login to GCR
       if: inputs.gcr_auth == 'true'
@@ -272,3 +260,22 @@ runs:
     - name: Setup docker buildx environment
       if: env.setup_buildx == 'true'
       uses: crazy-max/ghaction-github-runtime@3cb05d89e1f492524af3d41a1c98c83bc3025124 # v3.1.0
+
+    - name: GCloud OIDC Auth for GKE Direct WIF
+      id: auth_gke
+      if: inputs.gke_auth == 'true'
+      uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2
+      with:
+        workload_identity_provider: projects/161854031382/locations/global/workloadIdentityPools/github-pool/providers/gha-test
+
+    - name: Write GKE Credentials to kubeconfig
+      if: inputs.gke_auth == 'true'
+      uses: google-github-actions/get-gke-credentials@d0cee45012069b163a631894b98904a9e6723729 # v2.3.3
+      with:
+        cluster_name: ${{ steps.baseproject-config-k8s.outputs.cluster_name }}
+        project_id: ${{ steps.baseproject-config-k8s.outputs.cluster_project }}
+        location: ${{ steps.baseproject-config-k8s.outputs.cluster_location }}
+
+    - if: inputs.gke_auth == 'true'
+      shell: bash
+      run: kubectl config set-context --current --namespace=${{ steps.baseproject-config-k8s.outputs.namespace }}

@@ -26,7 +26,6 @@ jobs:
         project_name: github-actions-baseproject-tests
         gke_auth: true
         vault_export_token: true
-        gcr_auth: true
         gar_docker_auth: true
 
     - name: '[TEST] List GKE Clusters in Google Cloud'

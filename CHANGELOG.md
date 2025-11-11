@@ -5,7 +5,7 @@
 
 ### Bug Fixes
 
-* remove outdated gcr_auth flag and artifacts ([b4819fe](https://github.com/ZeitOnline/gh-action-baseproject/commit/b4819feb45cc19933ee81e472d1dea2b8eff3666))
+* remove outdated gcr_auth flag and artifacts ([0877a23](https://github.com/ZeitOnline/gh-action-baseproject/commit/8077a23b9e16c155cc0454e861963839fa0110f6))
 
 ## [0.14.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.13.0...v0.14.0) (2025-10-24)
 

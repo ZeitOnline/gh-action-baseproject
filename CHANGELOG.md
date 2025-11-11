@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.14.1](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.14.0...v0.14.1) (2025-11-11)
+
+
+### Bug Fixes
+
+* remove outdated gcr_auth flag and artifacts ([b4819fe](https://github.com/ZeitOnline/gh-action-baseproject/commit/b4819feb45cc19933ee81e472d1dea2b8eff3666))
+
 ## [0.14.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.13.0...v0.14.0) (2025-10-24)
 
 

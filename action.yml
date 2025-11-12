@@ -179,9 +179,7 @@ runs:
       if: inputs.gar_docker_auth == 'true'
       uses: google-github-actions/auth@6fc4af4b145ae7821d527454aa9bd537d1f2dc5f # v2
       with:
-        token_format: 'access_token'
         workload_identity_provider: projects/161854031382/locations/global/workloadIdentityPools/github-pool/providers/github-actions-provider
-        service_account: "registry-pusher@zeitonline-engineering.iam.gserviceaccount.com"
         create_credentials_file: false
 
     - name: Login to Docker GAR
@@ -190,7 +188,7 @@ runs:
       with:
         registry: europe-west3-docker.pkg.dev
         username: oauth2accesstoken
-        password: ${{ steps.gar_auth.outputs.access_token }}
+        password: ${{ steps.gar_auth.outputs.auth_token }}
 
 
     - name: GCloud OIDC Auth

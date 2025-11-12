@@ -1,0 +1,49 @@
+name: test-gar-auth
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - feat/use-registry-pusher-for-gar
+
+jobs:
+  
+  testing-gar-auth:
+    runs-on: zon-ubuntu-general-dind
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+    - name: Call baseproject GHA
+      id: baseproject
+      uses: ./
+      with:
+        project_name: github-actions-baseproject-tests
+        gke_auth: true
+        gar_docker_auth: true
+
+    - name: Debug info
+      run: |
+        ls
+        env
+        gcloud auth list
+
+    - name: Build and push docker image
+      uses: docker/build-push-action@v6
+      with:
+        push: true
+        file: test/Dockerfile
+        tags: |
+          ${{ secrets.GAR_DOCKER_REGISTRY }}/gha-tests:${{ github.sha }}
+
+    # Needs WIF to access GKE 
+    # - name: '[TEST] List GKE Clusters in Google Cloud'
+    #   run: gcloud container clusters list
+
+    # - name: '[TEST] Create a Kubernetes ConfigMap'
+    #   run: kubectl create configmap test-runner-${{ github.run_id }}-${{ github.run_attempt }} --from-literal=foo=bar
+  
+    

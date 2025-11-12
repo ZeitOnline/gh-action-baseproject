@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feat/use-registry-pusher-for-gar
+      - experiment/use-federated-wif-token-directly
 
 jobs:
   

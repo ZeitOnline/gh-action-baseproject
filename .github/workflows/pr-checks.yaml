@@ -58,3 +58,14 @@ jobs:
       env:
         UV_PUBLISH_USERNAME: oauth2accesstoken
         UV_PUBLISH_PASSWORD: ${{ steps.baseproject.outputs.gcloud_access_token }}
+
+    - name: '[TEST] Write to internal PyPi GAR'
+      run: |
+        cd test
+        uv build
+        uv publish
+      env:
+        UV_PUBLISH_USERNAME: oauth2accesstoken
+        UV_PUBLISH_PASSWORD: ${{ steps.baseproject.outputs.gcloud_access_token }}
+        UV_PUBLISH_URL: https://${{ vars.GAR_PYPI_REGISTRY_INTERNAL }}
+

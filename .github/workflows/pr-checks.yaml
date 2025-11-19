@@ -43,8 +43,29 @@ jobs:
         secrets: |
           zon/v1/github-actions-baseproject-tests/example foo | EXAMPLE_VAULT_VALUE ;
 
-    - name: '[TEST] Run docker build'
+    - name: '[TEST] Build and push docker image'
+      uses: docker/build-push-action@v6
+      with:
+        push: true
+        file: test/Dockerfile
+        tags: |
+          ${{ secrets.GAR_DOCKER_REGISTRY }}/gha-tests:${{ github.sha }}
+
+    - name: '[TEST] Read from PyPi GAR'
       run: |
-        docker buildx build --output type=docker \
-          --cache-from type=gha --cache-to type=gha,mode=max \
-          --tag test ./test
+        cd test
+        uv sync
+      env:
+        UV_PUBLISH_USERNAME: oauth2accesstoken
+        UV_PUBLISH_PASSWORD: ${{ steps.baseproject.outputs.gcloud_access_token }}
+
+    - name: '[TEST] Write to internal PyPi GAR'
+      run: |
+        cd test
+        uv build
+        uv publish
+      env:
+        UV_PUBLISH_USERNAME: oauth2accesstoken
+        UV_PUBLISH_PASSWORD: ${{ steps.baseproject.outputs.gcloud_access_token }}
+        UV_PUBLISH_URL: https://${{ vars.GAR_PYPI_REGISTRY_INTERNAL }}
+

@@ -30,6 +30,10 @@ inputs:
     description: 'Authenticate to GKE (Google Kubernetes Engine)'
     required: false
     default: 'false'
+  gke_cluster:
+    description: 'The GKE cluster to authenticate to (required if gke_auth is true)'
+    required: false
+    default: ''
   gar_docker_auth:
     description: 'Authenticate to Google Artifact Registry for Docker'
     required: false
@@ -97,6 +101,14 @@ runs:
       shell: bash
       run: echo "result=zon-v2/data/baseproject/${{ inputs.project_name }}/${{ inputs.environment }}/${{ inputs.unique_id }}" | tr -s / >> $GITHUB_OUTPUT
 
+    # TODO: enable after migration period
+    # - name: Validate GKE Auth Inputs
+    #   if: inputs.gke_auth == 'true' && inputs.gke_cluster == ''
+    #   shell: bash
+    #   run: |
+    #     echo "::error::gke_cluster must be set when gke_auth is true"
+    #     exit 1
+
     - name: Retrieve Baseproject Config from Vault
       id: raw-config
       uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
@@ -122,10 +134,25 @@ runs:
         echo "vault_role=${{ fromJSON(steps.raw-config.outputs.INFOS).vault-role }}" >> $GITHUB_OUTPUT
         echo "gha_vault_role=${{ fromJSON(steps.raw-config.outputs.INFOS).gha-vault-role }}" >> $GITHUB_OUTPUT
 
-    - name: Retrieve Baseproject K8S Config from Vault
-      if: inputs.gke_auth == 'true'
-      id: raw-config-k8s
+    - name: Retrieve Baseproject K8S Config from Vault (Specific Cluster)
+      if: inputs.gke_auth == 'true' && inputs.gke_cluster != ''
+      id: raw-config-k8s-specific
       uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
+      continue-on-error: true # TODO: Remove after migration period
+      with:
+        url: https://vault.ops.zeit.de
+        method: jwt
+        path: github-actions
+        role: gha-baseproject
+        secrets: |
+          ${{ steps.vault_path.outputs.result }}/infos-k8s-${{ inputs.gke_cluster }} raw | INFOS_K8S;
+
+    # TODO: Remove after migration period
+    - name: Retrieve Baseproject K8S Config from Vault (Fallback)
+      if: inputs.gke_auth == 'true' && (inputs.gke_cluster == '' || steps.raw-config-k8s-specific.outcome == 'failure')
+      id: raw-config-k8s-fallback
+      uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
+      continue-on-error: true
       with:
         url: https://vault.ops.zeit.de
         method: jwt
@@ -135,24 +162,26 @@ runs:
           ${{ steps.vault_path.outputs.result }}/infos-k8s raw | INFOS_K8S;
 
     - name: Warning for missing K8s config
-      if: inputs.gke_auth == 'true' && steps.raw-config-k8s.outputs.INFOS_K8S == ''
+      if: inputs.gke_auth == 'true' && steps.raw-config-k8s-specific.outputs.INFOS_K8S == '' && steps.raw-config-k8s-fallback.outputs.INFOS_K8S == ''
       shell: bash
       run: |
         echo "## ⚠️ Warning: K8s Configuration Secret Not Found" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "The separate K8s configuration secret was not found at:" >> $GITHUB_STEP_SUMMARY
+        echo "\`${{ steps.vault_path.outputs.result }}/infos-k8s-${{ inputs.gke_cluster }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "or" >> $GITHUB_STEP_SUMMARY
         echo "\`${{ steps.vault_path.outputs.result }}/infos-k8s\`" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "**Note:** The secret is only created if \`ci_sa_is_namespace_admin\` is set in your baseproject_k8s instance." >> $GITHUB_STEP_SUMMARY
 
     - id: baseproject-config-k8s
-      if: inputs.gke_auth == 'true'
+      if: inputs.gke_auth == 'true' && (steps.raw-config-k8s-specific.outputs.INFOS_K8S != '' || steps.raw-config-k8s-fallback.outputs.INFOS_K8S != '')
       shell: bash
       run: |
-        echo "namespace"=${{ fromJSON(steps.raw-config-k8s.outputs.INFOS_K8S).namespace }} >> $GITHUB_OUTPUT
-        echo "cluster_name"=${{ fromJSON(steps.raw-config-k8s.outputs.INFOS_K8S).cluster-name }} >> $GITHUB_OUTPUT
-        echo "cluster_project"=${{ fromJSON(steps.raw-config-k8s.outputs.INFOS_K8S).cluster-project }} >> $GITHUB_OUTPUT
-        echo "cluster_location"=${{ fromJSON(steps.raw-config-k8s.outputs.INFOS_K8S).cluster-location }} >> $GITHUB_OUTPUT
+        echo "namespace"=${{ fromJSON(steps.raw-config-k8s-specific.outputs.INFOS_K8S || steps.raw-config-k8s-fallback.outputs.INFOS_K8S).namespace }} >> $GITHUB_OUTPUT
+        echo "cluster_name"=${{ fromJSON(steps.raw-config-k8s-specific.outputs.INFOS_K8S || steps.raw-config-k8s-fallback.outputs.INFOS_K8S).cluster-name }} >> $GITHUB_OUTPUT
+        echo "cluster_project"=${{ fromJSON(steps.raw-config-k8s-specific.outputs.INFOS_K8S || steps.raw-config-k8s-fallback.outputs.INFOS_K8S).cluster-project }} >> $GITHUB_OUTPUT
+        echo "cluster_location"=${{ fromJSON(steps.raw-config-k8s-specific.outputs.INFOS_K8S || steps.raw-config-k8s-fallback.outputs.INFOS_K8S).cluster-location }} >> $GITHUB_OUTPUT
 
     - name: Retrieve zon-ops GitHub user GPG key
       id: zon-ops-gpg

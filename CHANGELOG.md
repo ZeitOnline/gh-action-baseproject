@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.14.1...v0.15.0) (2025-11-26)
+
+
+### Features
+
+* specify gke cluster ([007ea92](https://github.com/ZeitOnline/gh-action-baseproject/commit/007ea92719f5e050bc0547db950d8fb94d6506e0))
+
 ## [0.14.1](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.14.0...v0.14.1) (2025-11-11)
 
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.15.1](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.15.0...v0.15.1) (2025-11-27)
+
+
+### Bug Fixes
+
+* enforce gke_cluster and remove legacy k8s config fallback ([70bb85d](https://github.com/ZeitOnline/gh-action-baseproject/commit/70bb85d2672508ceec73c209604c9ba2a74e2d7f))
+
 ## [0.15.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.14.1...v0.15.0) (2025-11-26)
 
 

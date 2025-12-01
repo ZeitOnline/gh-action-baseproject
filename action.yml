@@ -259,3 +259,17 @@ runs:
       if: env.setup_buildx == 'true'
       uses: crazy-max/ghaction-github-runtime@3cb05d89e1f492524af3d41a1c98c83bc3025124 # v3.1.0
 
+    - name: Report Failures
+      if: failure()
+      uses: slackapi/slack-github-action@v2.1.1
+      with:
+        method: chat.postMessage
+        token: ${{ secrets.SLACK_BOT_TOKEN }}
+        payload: |
+          channel: ${{ env.SLACK_TEAM_OPS_ALERTS_CHANNEL_ID }}
+          text: "*Baseproject Action result*: ${{ job.status }}\n${{ github.repository }}"
+          blocks:
+            - type: "section"
+              text:
+                type: "mrkdwn"
+                text: ":warning: Baseproject Action result: ${{ job.status }}\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

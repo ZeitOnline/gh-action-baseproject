@@ -122,6 +122,16 @@ runs:
         echo "vault_role=${{ fromJSON(steps.raw-config.outputs.INFOS).vault-role }}" >> $GITHUB_OUTPUT
         echo "gha_vault_role=${{ fromJSON(steps.raw-config.outputs.INFOS).gha-vault-role }}" >> $GITHUB_OUTPUT
 
+    - name: Retrieve Self-Surveillance Slack Token from Vault
+      id: slack-token-vault
+      uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
+      with:
+        url: https://vault.ops.zeit.de
+        method: jwt
+        path: github-actions
+        role: gha-baseproject
+        secrets: zon/v1/slack/zeitonline/apps/github-actions-notifier token | NOTIFIER_TOKEN
+
     - name: Retrieve Baseproject K8S Config from Vault
       if: inputs.gke_auth == 'true'
       id: raw-config-k8s
@@ -264,12 +274,13 @@ runs:
       uses: slackapi/slack-github-action@v2.1.1
       with:
         method: chat.postMessage
-        token: ${{ secrets.SLACK_BOT_TOKEN }}
+        token: ${{ steps.vault.outputs.slack_bot_token }}
         payload: |
-          channel: ${{ env.SLACK_TEAM_OPS_ALERTS_CHANNEL_ID }}
+          channel: "team-ops-alerts"
           text: "*Baseproject Action result*: ${{ job.status }}\n${{ github.repository }}"
           blocks:
             - type: "section"
               text:
                 type: "mrkdwn"
                 text: ":warning: Baseproject Action result: ${{ job.status }}\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            - color: "warning"

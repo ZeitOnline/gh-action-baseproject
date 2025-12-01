@@ -129,7 +129,8 @@ runs:
         url: https://vault.ops.zeit.de
         method: jwt
         path: github-actions
-        role: gha-baseproject
+        role: terraform-ops
+        exportToken: true
         secrets: zon/v1/slack/zeitonline/apps/github-actions-notifier token | NOTIFIER_TOKEN
 
     - name: Retrieve Baseproject K8S Config from Vault

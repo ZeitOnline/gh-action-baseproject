@@ -130,7 +130,6 @@ runs:
         method: jwt
         path: github-actions
         role: terraform-ops
-        exportToken: true
         secrets: zon/v1/slack/zeitonline/apps/github-actions-notifier token | NOTIFIER_TOKEN
 
     - name: Retrieve Baseproject K8S Config from Vault

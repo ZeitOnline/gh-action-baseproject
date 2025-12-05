@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.16.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.15.1...v0.16.0) (2025-12-05)
+
+
+### Features
+
+* **gh-action-baseproject:** add automated reporting of failed runs ([f11e57c](https://github.com/ZeitOnline/gh-action-baseproject/commit/f11e57ceeceab604e4d77fd48b32f84c9b199ad3))
+
+
+### Bug Fixes
+
+* try different bracketing of condition ([29b4259](https://github.com/ZeitOnline/gh-action-baseproject/commit/29b42595015b91c93590a079af9785f8a0d1f23a))
+
 ## [0.15.1](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.15.0...v0.15.1) (2025-11-27)
 
 

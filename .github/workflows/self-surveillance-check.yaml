@@ -21,4 +21,4 @@ jobs:
         gke_auth: false
         vault_export_token: true
         gar_docker_auth: true
-        alerting_channel: C04US01KGN7
+        alerting_channel: C04US01KGN7 # test-slackbot

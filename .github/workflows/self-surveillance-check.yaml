@@ -18,8 +18,7 @@ jobs:
       uses: ./
       with:
         project_name: github-actions-baseproject-tests
-        gke_auth: true
+        gke_auth: false
         vault_export_token: true
         gar_docker_auth: true
         alerting_channel: test-slackbot
-        unique_id: invalid_test_value

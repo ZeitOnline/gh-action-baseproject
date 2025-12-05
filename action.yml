@@ -20,6 +20,10 @@ inputs:
     description: 'Python binary to use'
     required: false
     default: 'python'
+  alerting_channel:
+    description: 'Slack Channel to send alerts to should the action fail'
+    required: false
+    default: 'team-ops-alerts'
 
   # Authentication-related features to be used in the parent workflow
   google_auth:
@@ -287,7 +291,7 @@ runs:
         method: chat.postMessage
         token: ${{ steps.slack-token-vault.outputs.NOTIFIER_TOKEN }}
         payload: |
-          channel: "team-ops-alerts"
+          channel: ${{ inputs.alerting_channel }}
           text: "*Baseproject Action result*: ${{ job.status }}\n${{ github.repository }}"
           blocks:
             - type: "section"

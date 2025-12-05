@@ -114,7 +114,7 @@ runs:
 
     - name: Retrieve Baseproject Config from Vault
       id: raw-config
-      uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
+      uses: hashicorp/vault-action@4c06c5ccf5c0761b6029f56cfb1dcf5565918a3b # v3.4.0
       with:
         url: https://vault.ops.zeit.de
         method: jwt
@@ -139,7 +139,7 @@ runs:
 
     - name: Retrieve Self-Surveillance Slack Token from Vault
       id: slack-token-vault
-      uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
+      uses: hashicorp/vault-action@4c06c5ccf5c0761b6029f56cfb1dcf5565918a3b # v3.4.0
       with:
         url: https://vault.ops.zeit.de
         method: jwt
@@ -150,7 +150,7 @@ runs:
     - name: Retrieve Baseproject K8S Config from Vault
       if: inputs.gke_auth == 'true'
       id: raw-config-k8s
-      uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
+      uses: hashicorp/vault-action@4c06c5ccf5c0761b6029f56cfb1dcf5565918a3b # v3.4.0
       with:
         url: https://vault.ops.zeit.de
         method: jwt
@@ -181,7 +181,7 @@ runs:
 
     - name: Retrieve zon-ops GitHub user GPG key
       id: zon-ops-gpg
-      uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
+      uses: hashicorp/vault-action@4c06c5ccf5c0761b6029f56cfb1dcf5565918a3b # v3.4.0
       with:
         url: https://vault.ops.zeit.de
         method: jwt
@@ -218,7 +218,7 @@ runs:
 
     - name: Write GKE Credentials to kubeconfig
       if: inputs.gke_auth == 'true'
-      uses: google-github-actions/get-gke-credentials@d0cee45012069b163a631894b98904a9e6723729 # v2.3.3
+      uses: google-github-actions/get-gke-credentials@64bc7249bbcf78056bb92f14d3cedc2da193946c # v2.3.5
       with:
         cluster_name: ${{ steps.baseproject-config-k8s.outputs.cluster_name }}
         project_id: ${{ steps.baseproject-config-k8s.outputs.cluster_project }}
@@ -243,7 +243,7 @@ runs:
     - name: Export a Vault token
       id: vault-export-token
       if: inputs.vault_export_token == 'true'
-      uses: hashicorp/vault-action@7709c609789c5e27b757a85817483caadbb5939a # v3.3.0
+      uses: hashicorp/vault-action@4c06c5ccf5c0761b6029f56cfb1dcf5565918a3b # v3.4.0
       with:
         url: https://vault.ops.zeit.de
         method: jwt
@@ -272,7 +272,7 @@ runs:
         echo "setup_buildx=$setup_buildx" >> $GITHUB_ENV
     - name: Setup docker buildx container
       if: env.setup_buildx == 'true'
-      uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
+      uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
       with:
         buildkitd-config-inline: |
           debug = true

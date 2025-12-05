@@ -145,7 +145,6 @@ runs:
         method: jwt
         path: github-actions
         role: gha-baseproject
-        exportToken: true
         secrets: zon/v1/slack/zeitonline/apps/github-actions-notifier token | NOTIFIER_TOKEN
 
     - name: Retrieve Baseproject K8S Config from Vault
@@ -286,7 +285,7 @@ runs:
       uses: crazy-max/ghaction-github-runtime@3cb05d89e1f492524af3d41a1c98c83bc3025124 # v3.1.0
 
     - name: Report Failures
-      if: failure()
+      if: failure() || ${{ github.repository }} == 'ZeitOnline/gh-action-baseproject'
       uses: slackapi/slack-github-action@v2.1.1
       with:
         method: chat.postMessage

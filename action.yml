@@ -280,7 +280,6 @@ runs:
         method: chat.postMessage
         token: ${{ steps.slack-token-vault.outputs.NOTIFIER_TOKEN }}
         payload: |
-          errors: true
           channel: "${{inputs.alerting_channel}}"
           text: "*Baseproject Action result*: ${{ job.status }}\n${{ github.repository }}"
           blocks:

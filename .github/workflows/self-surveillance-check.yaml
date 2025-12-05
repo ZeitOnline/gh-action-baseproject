@@ -1,0 +1,25 @@
+name: Self-Surveillance Check
+on: [pull_request]
+
+# TODO: we clould run other checks as well (e.g. tf linting, docs creation etc.), maybe even via pre-commit
+jobs:
+  tests:
+    runs-on: zon-ubuntu-general-dind
+    permissions:
+      id-token: write
+      contents: write
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+    - name: Call baseproject GHA
+      id: baseproject
+      uses: ./
+      with:
+        project_name: github-actions-baseproject-tests
+        gke_auth: true
+        vault_export_token: true
+        gar_docker_auth: true
+        alerting_channel: test-slackbot
+        unique_id: invalid_test_value

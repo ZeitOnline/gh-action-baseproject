@@ -23,7 +23,7 @@ inputs:
   alerting_channel:
     description: 'Slack Channel to send alerts to should the action fail'
     required: false
-    default: 'team-ops-alerts'
+    default: 'test-slackbot'
 
   # Authentication-related features to be used in the parent workflow
   google_auth:

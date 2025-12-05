@@ -285,7 +285,7 @@ runs:
       uses: crazy-max/ghaction-github-runtime@3cb05d89e1f492524af3d41a1c98c83bc3025124 # v3.1.0
 
     - name: Report Failures
-      if: failure() || ${{ github.workflow }} == 'Self-Surveillance Check'
+      if: ${{failure() || github.workflow == 'Self-Surveillance Check'}}
       uses: slackapi/slack-github-action@v2.1.1
       with:
         method: chat.postMessage

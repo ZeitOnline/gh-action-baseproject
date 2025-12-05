@@ -297,4 +297,4 @@ runs:
             - type: "section"
               text:
                 type: "mrkdwn"
-                text: ":warning: Baseproject Action result: ${{ job.status }}\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+                text: ":warning: Baseproject Action result: ${{ job.status }}\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

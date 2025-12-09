@@ -293,13 +293,13 @@ runs:
         payload: |
           {
             "channel": "${{ inputs.alerting_channel }}",
-            "text": "*Baseproject Action result: ${{ failure() && 'Failed' || 'Succeeded' }}*\n${{ github.repository }}",
+            "text": "*Baseproject Action result: ${{ github.action_status }}*\n${{ github.repository }}",
             "blocks": [
               {
                 "type": "section",
                 "text": {
                   "type": "mrkdwn",
-                  "text": "${{ failure() && ':x:' || ':white_check_mark:' }} *Baseproject Action result: ${{ failure() && 'Failed' || 'Succeeded' }}*\n\n*Repository:* ${{ github.repository }}\n*Workflow:* ${{ github.workflow }}\n*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
+                  "text": ":warning: *Baseproject Action result: ${{ github.action_status }}*\n\n*Repository:* ${{ github.repository }}\n*Workflow:* ${{ github.workflow }}\n*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
                 }
               }
             ]

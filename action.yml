@@ -284,17 +284,23 @@ runs:
       if: env.setup_buildx == 'true'
       uses: crazy-max/ghaction-github-runtime@3cb05d89e1f492524af3d41a1c98c83bc3025124 # v3.1.0
 
-    - name: Report Failures
+    - name: Report Status
       if: ${{failure() || github.workflow == 'Self-Surveillance Check'}}
       uses: slackapi/slack-github-action@v2.1.1
       with:
         method: chat.postMessage
         token: ${{ steps.slack-token-vault.outputs.NOTIFIER_TOKEN }}
         payload: |
-          channel: "${{inputs.alerting_channel}}"
-          text: "*Baseproject Action result*: ${{ job.status }}\n${{ github.repository }}"
-          blocks:
-            - type: "section"
-              text:
-                type: "mrkdwn"
-                text: ":warning: Baseproject Action result: ${{ job.status }}\n${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          {
+            "channel": "${{ inputs.alerting_channel }}",
+            "text": "*Baseproject Action result: ${{ failure() && 'Failed' || 'Succeeded' }}*\n${{ github.repository }}",
+            "blocks": [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "${{ failure() && ':x:' || ':white_check_mark:' }} *Baseproject Action result: ${{ failure() && 'Failed' || 'Succeeded' }}*\n\n*Repository:* ${{ github.repository }}\n*Workflow:* ${{ github.workflow }}\n*Run:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
+                }
+              }
+            ]
+          }

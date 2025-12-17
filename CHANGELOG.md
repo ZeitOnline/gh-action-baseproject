@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.16.1](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.16.0...v0.16.1) (2025-12-17)
+
+
+### Bug Fixes
+
+* status message ([dc340d2](https://github.com/ZeitOnline/gh-action-baseproject/commit/dc340d20d56496e910e1423645c05909510811d3))
+* status message content ([e1d18b5](https://github.com/ZeitOnline/gh-action-baseproject/commit/e1d18b5acc8dfe64f372e7c7a79e1f529d84e91f))
+
 ## [0.16.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.15.1...v0.16.0) (2025-12-05)
 
 

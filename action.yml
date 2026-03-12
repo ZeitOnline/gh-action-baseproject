@@ -190,7 +190,7 @@ runs:
         secrets: zon/v1/github/zon-ops gpg_key_private
 
     - name: Import GPG key for zon-ops user
-      uses: crazy-max/ghaction-import-gpg@cb9bde2e2525e640591a934b1fd28eef1dcaf5e5 # v6
+      uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7
       continue-on-error: true
       with:
         gpg_private_key: ${{ steps.zon-ops-gpg.outputs.gpg_key_private }}
@@ -218,7 +218,7 @@ runs:
 
     - name: Write GKE Credentials to kubeconfig
       if: inputs.gke_auth == 'true'
-      uses: google-github-actions/get-gke-credentials@d0cee45012069b163a631894b98904a9e6723729 # v2.3.3
+      uses: google-github-actions/get-gke-credentials@3da1e46a907576cefaa90c484278bb5b259dd395 # v3.0.0
       with:
         cluster_name: ${{ steps.baseproject-config-k8s.outputs.cluster_name }}
         project_id: ${{ steps.baseproject-config-k8s.outputs.cluster_project }}
@@ -272,7 +272,7 @@ runs:
         echo "setup_buildx=$setup_buildx" >> $GITHUB_ENV
     - name: Setup docker buildx container
       if: env.setup_buildx == 'true'
-      uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.10.0
+      uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
       with:
         buildkitd-config-inline: |
           debug = true

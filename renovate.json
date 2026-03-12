@@ -16,6 +16,7 @@
           "matchUpdateTypes": ["minor", "patch"],
           "matchManagers": ["github-actions"],
           "semanticCommitType": "fix",
+          "semanticCommitScope": "gha",
           "groupName": "github-actions",
           "automerge": true
         },
@@ -23,7 +24,18 @@
           "description": "Use fix prefix for action.yml updates, so release-please recognizes them as patch updates",
           "matchFileNames": ["action.yml"],
           "matchManagers": ["github-actions"],
-          "semanticCommitType": "fix"
+          "semanticCommitType": "fix",
+          "semanticCommitScope": "gha"
+        },
+        {
+          "description": "Label dependencies that are older than 6 months",
+          "matchPackagePatterns": [
+            "*"
+          ],
+          "matchCurrentAge": "> 6 months",
+          "addLabels": [
+            "older-than-6-months"
+          ]
         }
       ]
-  }
+}

@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.17.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.16.1...v0.17.0) (2026-03-12)
+
+
+### Features
+
+* **renovate:** label prs older than 6 months ([353c960](https://github.com/ZeitOnline/gh-action-baseproject/commit/353c9607177a535097afa5b0068c423f565cd722))
+
+
+### Bug Fixes
+
+* **deps:** pin slackapi/slack-github-action action to 91efab1 ([b6820df](https://github.com/ZeitOnline/gh-action-baseproject/commit/b6820df8a1cf7d7ead0a79cb908d71e6d5c745c3))
+* **deps:** update crazy-max/ghaction-github-runtime action to v4.0.0 ([8470299](https://github.com/ZeitOnline/gh-action-baseproject/commit/8470299846eccf398dd753d9ba98afa88c19d3b1))
+* **deps:** update crazy-max/ghaction-import-gpg action to v7 ([f1edadf](https://github.com/ZeitOnline/gh-action-baseproject/commit/f1edadfe3b40ea65ad2d38e4f826d3e42b870ebf))
+* **deps:** update docker/login-action action to v4 ([9393bb9](https://github.com/ZeitOnline/gh-action-baseproject/commit/9393bb9c732f1d0aaab4ee3055fdb4fbd4b0c3e3))
+* **deps:** update docker/setup-buildx-action action to v4.0.0 ([4915b48](https://github.com/ZeitOnline/gh-action-baseproject/commit/4915b48f30cb7a21ecad5612a404451ba9fa6af0))
+* **deps:** update google-github-actions/auth action to v3 ([44a106f](https://github.com/ZeitOnline/gh-action-baseproject/commit/44a106fb5ece7aebae37cb049142fffd726aaf5c))
+* **deps:** update google-github-actions/get-gke-credentials action to v3.0.0 ([cce03e2](https://github.com/ZeitOnline/gh-action-baseproject/commit/cce03e209e73c36f9481e6f86641a4671a604e4d))
+* **deps:** update hashicorp/vault-action action to v3.4.0 ([92d29c4](https://github.com/ZeitOnline/gh-action-baseproject/commit/92d29c43538e096ec00baeb66733da705389ab50))
+
 ## [0.16.1](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.16.0...v0.16.1) (2025-12-17)
 
 

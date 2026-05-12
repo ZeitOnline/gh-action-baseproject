@@ -29,12 +29,12 @@
         },
         {
           "description": "Label dependencies that are older than 6 months",
-          "matchPackagePatterns": [
-            "*"
-          ],
           "matchCurrentAge": "> 6 months",
           "addLabels": [
             "older-than-6-months"
+          ],
+          "matchPackageNames": [
+            "*"
           ]
         }
       ]

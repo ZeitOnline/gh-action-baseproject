@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.17.1](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.17.0...v0.17.1) (2026-05-13)
+
+
+### Bug Fixes
+
+* **gha:** update docker/login-action digest to 4907a6d ([b26a120](https://github.com/ZeitOnline/gh-action-baseproject/commit/b26a1203118ca9d37be8494ebbd331501f40199d))
+* **gha:** update hashicorp/vault-action action to v4 ([4030840](https://github.com/ZeitOnline/gh-action-baseproject/commit/4030840138ee9ae11dadb938d375951fa4e7c61a))
+* **gha:** update slackapi/slack-github-action action to v3.0.3 ([d5f299b](https://github.com/ZeitOnline/gh-action-baseproject/commit/d5f299b79a742a7a9b0ba0fa5c91c8c3ae8b0eaf))
+
 ## [0.17.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.16.1...v0.17.0) (2026-03-12)
 
 

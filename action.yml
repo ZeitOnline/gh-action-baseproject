@@ -156,6 +156,7 @@ runs:
         method: jwt
         path: github-actions
         role: gha-baseproject
+        jwtGithubAudience: vault
         secrets: |
           ${{ steps.vault_path.outputs.result }}/infos-k8s-${{ inputs.gke_cluster }} raw | INFOS_K8S;
 

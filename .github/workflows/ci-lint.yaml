@@ -1,0 +1,45 @@
+name: CI Lint
+
+# Static analysis for this repo's GitHub Actions files, mirroring
+# `lint-workflows.yaml` in ZeitOnline/gh-action-workflows-ops.
+#
+# Kept self-contained instead of calling that reusable workflow: this repo is
+# public, gh-action-workflows-ops is private, and a public repo calling a private
+# repo's reusable workflow is not a pattern we have confirmed. A local job has no
+# cross-repo dependency and cannot break when that repo's Actions access setting
+# changes.
+#
+# actionlint also validates `action.yml` itself, because `pr-checks.yaml` calls
+# the action via `uses: ./` — the inputs used there are checked against the
+# action's declared inputs.
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  checks: write # required by reviewdog's github-pr-check reporter
+
+jobs:
+  actionlint:
+    name: Actionlint
+    runs-on: zon-ubuntu-general-dind
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          # nothing here talks to git after checkout; actionlint reads the tree and
+          # reviewdog authenticates through its own token input
+          persist-credentials: false
+
+      - name: Run actionlint
+        uses: reviewdog/action-actionlint@50842263c20a7c46bd0065b9e624d3c569db061e # v1.73.0
+        with:
+          reporter: github-pr-check
+          # lint every workflow, not just the ones the PR touches
+          filter_mode: nofilter
+          level: error
+          fail_level: error
+          # the shellcheck and pyflakes integrations flag findings in every `run:`
+          # block that was never linted before; drop the flags for full strength
+          actionlint_flags: '-shellcheck= -pyflakes='

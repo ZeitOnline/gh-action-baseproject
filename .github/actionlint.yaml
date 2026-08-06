@@ -1,0 +1,9 @@
+# actionlint only knows the GitHub-hosted runner labels and errors on any other
+# `runs-on:`. This declares the ZON self-hosted scale sets, same list as the
+# default in ZeitOnline/gh-action-workflows-ops.
+self-hosted-runner:
+  labels:
+    - zon-ubuntu-general-dind
+    - zon-ubuntu-general-dind-devel
+    - zon-ubuntu-general-k8s
+    - zon-ubuntu-general-k8s-devel

@@ -123,7 +123,30 @@ runs:
         secrets: |
           ${{ steps.vault_path.outputs.result }}/infos raw | INFOS;
 
-    - id: baseproject-config
+    - name: Explain a missing Baseproject config
+      if: failure() && steps.raw-config.outcome == 'failure'
+      shell: bash
+      run: |
+        path="${{ steps.vault_path.outputs.result }}/infos"
+        echo "::error::No baseproject config readable at '$path'. Either the Terraform baseproject instance for project '${{ inputs.project_name }}' (environment '${{ inputs.environment }}') was never applied, or the unique_id input is missing, or the gha-baseproject Vault role has no access to that path."
+        {
+          echo "## ❌ Baseproject config not found in Vault"
+          echo ""
+          echo "The action could not read \`$path\`."
+          echo ""
+          echo "Checklist:"
+          echo "- Is the \`baseproject\` Terraform instance for project \`${{ inputs.project_name }}\` applied for environment \`${{ inputs.environment }}\`?"
+          echo "- Does that instance use a \`unique_id\`? If so, pass it via the \`unique_id\` input (currently \`${{ inputs.unique_id }}\`)."
+          echo "- Does the \`gha-baseproject\` Vault role grant read access to the path?"
+        } >> $GITHUB_STEP_SUMMARY
+
+    # NOTE: needs an explicit `name`. Without one the runner derives the display name from
+    # the `run` script and renders it for every step, whether or not the step runs — so an
+    # empty `INFOS` makes fromJSON('') log "Encountered an error when evaluating display
+    # name … Error reading JToken from JsonReader". That is only a warning, never fatal,
+    # but it is prominent enough to be mistaken for the actual error.
+    - name: Set Baseproject Config outputs
+      id: baseproject-config
       shell: bash
       # Right now this is the only known way to pass outputs from a JSON value as outputs from
       # a composite action (hypothesis: between here and any outputs.xy.value, some JSON auto-
@@ -170,14 +193,20 @@ runs:
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "**Note:** The secret is only created if \`ci_sa_is_namespace_admin\` is set in your baseproject_k8s instance." >> $GITHUB_STEP_SUMMARY
 
-    - id: baseproject-config-k8s
+    # NOTE: needs an explicit `name`, same reason as `baseproject-config` above. This one
+    # warned on every single call with `gke_auth: false`, because `raw-config-k8s` is then
+    # skipped and its output is empty. The `|| '{}'` fallbacks keep the template valid for
+    # that rendering; they do not affect the executed script, which only runs once the `if`
+    # below has confirmed a non-empty value.
+    - name: Set Baseproject K8S Config outputs
+      id: baseproject-config-k8s
       if: inputs.gke_auth == 'true' && steps.raw-config-k8s.outputs.INFOS_K8S != ''
       shell: bash
       run: |
-        echo "namespace"=${{ fromJSON(steps.raw-config-k8s.outputs.INFOS_K8S).namespace }} >> $GITHUB_OUTPUT
-        echo "cluster_name"=${{ fromJSON(steps.raw-config-k8s.outputs.INFOS_K8S).cluster-name }} >> $GITHUB_OUTPUT
-        echo "cluster_project"=${{ fromJSON(steps.raw-config-k8s.outputs.INFOS_K8S).cluster-project }} >> $GITHUB_OUTPUT
-        echo "cluster_location"=${{ fromJSON(steps.raw-config-k8s.outputs.INFOS_K8S).cluster-location }} >> $GITHUB_OUTPUT
+        echo "namespace=${{ fromJSON(steps.raw-config-k8s.outputs.INFOS_K8S || '{}').namespace }}" >> $GITHUB_OUTPUT
+        echo "cluster_name=${{ fromJSON(steps.raw-config-k8s.outputs.INFOS_K8S || '{}').cluster-name }}" >> $GITHUB_OUTPUT
+        echo "cluster_project=${{ fromJSON(steps.raw-config-k8s.outputs.INFOS_K8S || '{}').cluster-project }}" >> $GITHUB_OUTPUT
+        echo "cluster_location=${{ fromJSON(steps.raw-config-k8s.outputs.INFOS_K8S || '{}').cluster-location }}" >> $GITHUB_OUTPUT
 
     - name: Retrieve zon-ops GitHub user GPG key
       id: zon-ops-gpg
@@ -224,7 +253,8 @@ runs:
         project_id: ${{ steps.baseproject-config-k8s.outputs.cluster_project }}
         location: ${{ steps.baseproject-config-k8s.outputs.cluster_location }}
 
-    - if: inputs.gke_auth == 'true'
+    - name: Set kubectl context namespace
+      if: inputs.gke_auth == 'true' && steps.baseproject-config-k8s.outputs.namespace != ''
       shell: bash
       run: kubectl config set-context --current --namespace=${{ steps.baseproject-config-k8s.outputs.namespace }}
 
@@ -284,8 +314,16 @@ runs:
       if: env.setup_buildx == 'true'
       uses: crazy-max/ghaction-github-runtime@04d248b84655b509d8c44dc1d6f990c879747487 # v4.0.0
 
+    # The Slack token comes from `slack-token-vault`, which is itself skipped when an
+    # earlier step failed. Without this guard the reporter then fails with "Missing input!
+    # A token must be provided", which becomes the job's last error and masks the real one.
+    - name: Warn about a skipped status report
+      if: ${{ (failure() || github.workflow == 'Self-Surveillance Check') && steps.slack-token-vault.outputs.NOTIFIER_TOKEN == '' }}
+      shell: bash
+      run: echo "::warning::No Slack token available (the token step did not run), skipping the status report to ${{ inputs.alerting_channel }}."
+
     - name: Report Status
-      if: ${{failure() || github.workflow == 'Self-Surveillance Check'}}
+      if: ${{ (failure() || github.workflow == 'Self-Surveillance Check') && steps.slack-token-vault.outputs.NOTIFIER_TOKEN != '' }}
       uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
       with:
         method: chat.postMessage

@@ -128,19 +128,23 @@ runs:
           ${{ steps.vault_path.outputs.result }}/infos raw | INFOS;
 
     - name: Explain a missing Baseproject config
+      env:
+        PROJECT_NAME: ${{ inputs.project_name }}
+        ENVIRONMENT: ${{ inputs.environment }}
+        UNIQUE_ID: ${{ inputs.unique_id }}
       if: failure() && steps.raw-config.outcome == 'failure'
       shell: bash
       run: |
         path="${{ steps.vault_path.outputs.result }}/infos"
-        echo "::error::No baseproject config readable at '$path'. Either the Terraform baseproject instance for project '${{ inputs.project_name }}' (environment '${{ inputs.environment }}') was never applied, or the unique_id input is missing, or the gha-baseproject Vault role has no access to that path."
+        echo "::error::No baseproject config readable at '$path'. Either the Terraform baseproject instance for project '${PROJECT_NAME}' (environment '${ENVIRONMENT}') was never applied, or the unique_id input is missing, or the gha-baseproject Vault role has no access to that path."
         {
           echo "## ❌ Baseproject config not found in Vault"
           echo ""
           echo "The action could not read \`$path\`."
           echo ""
           echo "Checklist:"
-          echo "- Is the \`baseproject\` Terraform instance for project \`${{ inputs.project_name }}\` applied for environment \`${{ inputs.environment }}\`?"
-          echo "- Does that instance use a \`unique_id\`? If so, pass it via the \`unique_id\` input (currently \`${{ inputs.unique_id }}\`)."
+          echo "- Is the \`baseproject\` Terraform instance for project \`${PROJECT_NAME}\` applied for environment \`${ENVIRONMENT}\`?"
+          echo "- Does that instance use a \`unique_id\`? If so, pass it via the \`unique_id\` input (currently \`${UNIQUE_ID}\`)."
           echo "- Does the \`gha-baseproject\` Vault role grant read access to the path?"
         } >> $GITHUB_STEP_SUMMARY
 
@@ -239,7 +243,7 @@ runs:
 
     - name: Authenticate github.com traffic
       shell: bash
-      run: |
+      run: | # zizmor: ignore[github-env]
         # github.com meters anonymous traffic at 60 requests/hour per source IP and
         # the whole runner fleet shares one NAT address; over-quota requests come back
         # as 401, which git reports as "could not read Username". The runner image
@@ -263,8 +267,9 @@ runs:
       shell: bash
       env:
         ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
-      run: |
+      run: | # zizmor: ignore[github-env]
         echo "gcloud_access_token=${ACCESS_TOKEN}" >> $GITHUB_OUTPUT
+        echo "GCLOUD_TOKEN=${ACCESS_TOKEN}" >> $GITHUB_ENV
 
     - name: Write GKE Credentials to kubeconfig
       if: inputs.gke_auth == 'true'
@@ -281,7 +286,7 @@ runs:
 
     - name: Login to Docker GAR
       if: inputs.gar_docker_auth == 'true'
-      uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
+      uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
       with:
         registry: europe-west3-docker.pkg.dev
         username: oauth2accesstoken
@@ -345,11 +350,15 @@ runs:
     # earlier step failed. Without this guard the reporter then fails with "Missing input!
     # A token must be provided", which becomes the job's last error and masks the real one.
     - name: Warn about a skipped status report
+      env:
+        ALERTING_CHANNEL: ${{ inputs.alerting_channel }}
       if: ${{ (failure() || github.workflow == 'Self-Surveillance Check') && steps.slack-token-vault.outputs.NOTIFIER_TOKEN == '' }}
       shell: bash
-      run: echo "::warning::No Slack token available (the token step did not run), skipping the status report to ${{ inputs.alerting_channel }}."
+      run: echo "::warning::No Slack token available (the token step did not run), skipping the status report to ${ALERTING_CHANNEL}."
 
     - name: Report Status
+      env:
+        ALERTING_CHANNEL: ${{ inputs.alerting_channel }}
       if: ${{ (failure() || github.workflow == 'Self-Surveillance Check') && steps.slack-token-vault.outputs.NOTIFIER_TOKEN != '' }}
       uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4
       with:
@@ -357,7 +366,7 @@ runs:
         token: ${{ steps.slack-token-vault.outputs.NOTIFIER_TOKEN }}
         payload: |
           {
-            "channel": "${{ inputs.alerting_channel }}",
+            "channel": "${ALERTING_CHANNEL}",
             "text": "*Baseproject Action result: ${{ github.action_status }}*\n${{ github.repository }}",
             "blocks": [
               {

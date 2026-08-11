@@ -67,6 +67,27 @@ jobs:
 ```
 
 
+### Use the GCloud access token
+
+The GCloud access token is exposed as the `gcloud_access_token` output. It is deliberately *not*
+exported into the job environment (writing secrets to `GITHUB_ENV` makes them visible to every
+subsequent step of the job); map it onto the steps that need it instead:
+
+```yaml
+            - name: Baseproject
+              id: baseproject
+              uses: ZeitOnline/gh-action-baseproject@v0
+              with:
+                project_name: ${{ env.PROJECT }}
+                environment: ${{ env.ENVIRONMENT }}
+                google_auth: true
+
+            - name: Use the token
+              env:
+                GCLOUD_TOKEN: ${{ steps.baseproject.outputs.gcloud_access_token }}
+              run: curl -H "Authorization: Bearer ${GCLOUD_TOKEN}" ...
+```
+
 ### Set up docker buildx
 
 For both convenience and consistency this action can also set up a `docker buildx` builder.

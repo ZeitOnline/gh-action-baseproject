@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.17.2](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.17.1...v0.17.2) (2026-08-12)
+
+
+### Bug Fixes
+
+* **gha:** report missing baseproject config clearly ([70c2f89](https://github.com/ZeitOnline/gh-action-baseproject/commit/70c2f890fe67ece90eeb4dab1900e7db07b9e66e))
+
 ## [0.17.1](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.17.0...v0.17.1) (2026-05-13)
 
 

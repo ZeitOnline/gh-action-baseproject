@@ -324,7 +324,7 @@ runs:
 
     - name: Report Status
       if: ${{ (failure() || github.workflow == 'Self-Surveillance Check') && steps.slack-token-vault.outputs.NOTIFIER_TOKEN != '' }}
-      uses: slackapi/slack-github-action@45a88b9581bfab2566dc881e2cd66d334e621e2c # v3.0.3
+      uses: slackapi/slack-github-action@dcb1066f776dd043e64d0e8ba94ca15cc7e1875d # v4
       with:
         method: chat.postMessage
         token: ${{ steps.slack-token-vault.outputs.NOTIFIER_TOKEN }}

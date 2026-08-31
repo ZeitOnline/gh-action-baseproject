@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.17.3](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.17.2...v0.17.3) (2026-08-31)
+
+
+### Bug Fixes
+
+* **gha:** update slackapi/slack-github-action action to v4 ([35a3275](https://github.com/ZeitOnline/gh-action-baseproject/commit/35a3275ffbc954a43c49f46c6928ef120dd60723))
+
 ## [0.17.2](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.17.1...v0.17.2) (2026-08-12)
 
 

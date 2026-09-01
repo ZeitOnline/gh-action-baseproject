@@ -103,7 +103,11 @@ runs:
   steps:
     - id: vault_path
       shell: bash
-      run: echo "result=zon-v2/data/baseproject/${{ inputs.project_name }}/${{ inputs.environment }}/${{ inputs.unique_id }}" | tr -s / >> $GITHUB_OUTPUT
+      env:
+        PROJECT_NAME: ${{ inputs.project_name }}
+        ENVIRONMENT: ${{ inputs.environment }}
+        UNIQUE_ID: ${{ inputs.unique_id }}
+      run: echo "result=zon-v2/data/baseproject/${PROJECT_NAME}/${ENVIRONMENT}/${UNIQUE_ID}" | tr -s / >> $GITHUB_OUTPUT
 
     - name: Validate GKE Auth Inputs
       if: inputs.gke_auth == 'true' && inputs.gke_cluster == ''
@@ -152,9 +156,12 @@ runs:
       # a composite action (hypothesis: between here and any outputs.xy.value, some JSON auto-
       # detection mambo-jambo kicks in and converts the JSON to an internal map-like data
       # structure from which it's impossible (or at least unclear) how to get individual fields).
+      env:
+        PROJECT_NAME: ${{ inputs.project_name }}
+        ENVIRONMENT: ${{ inputs.environment }}
       run: |
-        echo "project_name=${{ inputs.project_name }}" >> $GITHUB_OUTPUT
-        echo "environment=${{ inputs.environment }}" >> $GITHUB_OUTPUT
+        echo "project_name=${PROJECT_NAME}" >> $GITHUB_OUTPUT
+        echo "environment=${ENVIRONMENT}" >> $GITHUB_OUTPUT
         echo "ci_sa_name=${{ fromJSON(steps.raw-config.outputs.INFOS).ci-sa-name }}" >> $GITHUB_OUTPUT
         echo "wi_sa_name=${{ fromJSON(steps.raw-config.outputs.INFOS).wi-sa-name }}" >> $GITHUB_OUTPUT
         echo "vault_role=${{ fromJSON(steps.raw-config.outputs.INFOS).vault-role }}" >> $GITHUB_OUTPUT
@@ -185,11 +192,13 @@ runs:
     - name: Warning for missing K8s config
       if: inputs.gke_auth == 'true' && steps.raw-config-k8s.outputs.INFOS_K8S == ''
       shell: bash
+      env:
+        GKE_CLUSTER: ${{ inputs.gke_cluster }}
       run: |
         echo "## ⚠️ Warning: K8s Configuration Secret Not Found" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "The separate K8s configuration secret was not found at:" >> $GITHUB_STEP_SUMMARY
-        echo "\`${{ steps.vault_path.outputs.result }}/infos-k8s-${{ inputs.gke_cluster }}\`" >> $GITHUB_STEP_SUMMARY
+        echo "\`${{ steps.vault_path.outputs.result }}/infos-k8s-${GKE_CLUSTER}\`" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "**Note:** The secret is only created if \`ci_sa_is_namespace_admin\` is set in your baseproject_k8s instance." >> $GITHUB_STEP_SUMMARY
 
@@ -241,9 +250,10 @@ runs:
       id: output_gcloud_token
       if: steps.auth.outputs.access_token != ''
       shell: bash
+      env:
+        ACCESS_TOKEN: ${{ steps.auth.outputs.access_token }}
       run: |
-        echo "gcloud_access_token=${{ steps.auth.outputs.access_token }}" >> $GITHUB_OUTPUT
-        echo "GCLOUD_TOKEN=${{ steps.auth.outputs.access_token }}" >> $GITHUB_ENV
+        echo "gcloud_access_token=${ACCESS_TOKEN}" >> $GITHUB_OUTPUT
 
     - name: Write GKE Credentials to kubeconfig
       if: inputs.gke_auth == 'true'
@@ -260,7 +270,7 @@ runs:
 
     - name: Login to Docker GAR
       if: inputs.gar_docker_auth == 'true'
-      uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4
+      uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v4.1.0
       with:
         registry: europe-west3-docker.pkg.dev
         username: oauth2accesstoken
@@ -290,18 +300,24 @@ runs:
       id: python-registry
       if: inputs.python_registry == 'true'
       shell: bash
+      env:
+        PYTHON_BINARY: ${{ inputs.python_binary }}
       run: |
-        ${{ inputs.python_binary }} -m pip install --upgrade --upgrade-strategy eager setuptools twine keyrings.google-artifactregistry-auth
+        "${PYTHON_BINARY}" -m pip install --upgrade --upgrade-strategy eager setuptools twine keyrings.google-artifactregistry-auth
     - name: Parse setup docker buildx input
+      id: parse-setup-docker-buildx-input
       shell: bash
+      env:
+        SETUP_BUILDX: ${{ inputs.setup_buildx }}
+        GAR_DOCKER_AUTH: ${{ inputs.gar_docker_auth }}
       run: |
-        setup_buildx="${{ inputs.setup_buildx }}"
-        if [[ "$setup_buildx" != "false" && "${{ inputs.gar_docker_auth }}" = "true" ]]; then
+        setup_buildx="${SETUP_BUILDX}"
+        if [[ "$setup_buildx" != "false" && "${GAR_DOCKER_AUTH}" = "true" ]]; then
             setup_buildx="true"
         fi
-        echo "setup_buildx=$setup_buildx" >> $GITHUB_ENV
+        echo "setup_buildx=$setup_buildx" >> $GITHUB_OUTPUT
     - name: Setup docker buildx container
-      if: env.setup_buildx == 'true'
+      if: steps.parse-setup-docker-buildx-input.outputs.setup_buildx == 'true'
       uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
       with:
         buildkitd-config-inline: |
@@ -311,7 +327,7 @@ runs:
     # Support `docker buildx build --cache-[from|to] type=gha` directly,
     # and not just via docker/build-push-action.
     - name: Setup docker buildx environment
-      if: env.setup_buildx == 'true'
+      if: steps.parse-setup-docker-buildx-input.outputs.setup_buildx == 'true'
       uses: crazy-max/ghaction-github-runtime@04d248b84655b509d8c44dc1d6f990c879747487 # v4.0.0
 
     # The Slack token comes from `slack-token-vault`, which is itself skipped when an

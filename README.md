@@ -78,6 +78,29 @@ Setting `gar_docker_auth` also enables this implicitly
 if this is not desired, set `setup_buildx` to "false" explicitly.
 
 
+### Authenticate github.com traffic
+
+The action exports the job's own `GITHUB_TOKEN` as `GH_TOKEN` for all following steps.
+This is unconditional and has no input.
+
+github.com meters anonymous traffic at 60 requests per hour per source IP, and the whole
+runner fleet shares one NAT address. Over-quota requests are answered with `401`, which git
+reports as `could not read Username for 'https://github.com'` — the failure mode seen in
+kustomize remote bases and OpenTofu module downloads, on repositories that are public.
+The runner image carries a git credential helper that picks this variable up, so all
+following git operations against github.com use the token's per-repository quota instead.
+The `gh` CLI is authenticated by the same variable.
+
+Two consequences worth knowing:
+
+- The token is a normal environment variable from this point on, visible to every following
+  step. It is the same token the job already has via `secrets.GITHUB_TOKEN`, so this grants
+  nothing new, but it is easier to leak by accident — for example through a tool that dumps
+  its environment.
+- A step or job that declares its own `GH_TOKEN` under `env:` still takes precedence, so
+  workflows that pass a different token are unaffected.
+
+
 ## Reference
 
 Here are all the inputs available through `with`:

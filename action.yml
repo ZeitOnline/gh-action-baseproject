@@ -228,6 +228,17 @@ runs:
         # git_tag_gpgsign: true
         git_config_global: true
 
+    - name: Authenticate github.com traffic
+      shell: bash
+      run: |
+        # github.com meters anonymous traffic at 60 requests/hour per source IP and
+        # the whole runner fleet shares one NAT address; over-quota requests come back
+        # as 401, which git reports as "could not read Username". The runner image
+        # carries a credential helper that reads this variable and is inert without
+        # it, so exporting it here is what moves the fleet's git traffic onto the
+        # per-repository quota. Also authenticates the gh CLI.
+        echo "GH_TOKEN=${{ github.token }}" >> "$GITHUB_ENV"
+
     - name: GCloud OIDC Auth
       id: auth
       if: inputs.google_auth == 'true' || inputs.gke_auth == 'true' || inputs.gar_docker_auth == 'true'

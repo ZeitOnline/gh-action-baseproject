@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.18.0](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.17.3...v0.18.0) (2026-10-06)
+
+
+### Features
+
+* add permissions block for commitlint job ([4f3830a](https://github.com/ZeitOnline/gh-action-baseproject/commit/4f3830a659b87e2b1dbf4f352df825d445b2f40d))
+* add zizmor scanning in self-check ([ab33f3c](https://github.com/ZeitOnline/gh-action-baseproject/commit/ab33f3c09fed1408957da469979c3804faba6081))
+* export the job token as GH_TOKEN for github.com traffic ([71f4b8d](https://github.com/ZeitOnline/gh-action-baseproject/commit/71f4b8d0b4d3cef73c9136eeb55c3b9b027dea6f))
+
+
+### Bug Fixes
+
+* **gha:** update github-actions ([fde17d3](https://github.com/ZeitOnline/gh-action-baseproject/commit/fde17d3c3f845711106ca953ee13c3e3da9ea554))
+
 ## [0.17.3](https://github.com/ZeitOnline/gh-action-baseproject/compare/v0.17.2...v0.17.3) (2026-08-31)
 
 

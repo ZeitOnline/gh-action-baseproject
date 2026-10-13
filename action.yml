@@ -229,7 +229,7 @@ runs:
         method: jwt
         path: github-actions
         role: gha-baseproject
-        secrets: zon/v1/github/zon-ops gpg_key_private
+        secrets: zon/v1/github/users/zon-ops gpg_key_private
 
     - name: Import GPG key for zon-ops user
       uses: crazy-max/ghaction-import-gpg@2dc316deee8e90f13e1a351ab510b4d5bc0c82cd # v7
